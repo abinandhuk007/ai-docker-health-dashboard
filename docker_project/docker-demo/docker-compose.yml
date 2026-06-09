@@ -1,0 +1,310 @@
+version: "3.9"
+
+# =============================================================================
+# Docker Monitor AI — Demo Production Environment
+# 10 containers simulating a real microservices stack
+#
+# Expected states after startup:
+#   RUNNING    : nginx-web, postgres-db, redis-cache, prometheus, grafana
+#   UNHEALTHY  : elasticsearch (health check intentionally fails)
+#   RESTARTING : rabbitmq-queue (crashes immediately and restarts)
+#   EXITED     : react-frontend, fastapi-backend (exit on startup)
+# =============================================================================
+
+networks:
+  frontend-net:
+    driver: bridge
+  backend-net:
+    driver: bridge
+  monitoring-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+  elasticsearch-data:
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # 1. nginx-web  →  RUNNING  (reverse proxy / web server)
+  # ---------------------------------------------------------------------------
+  nginx-web:
+    image: nginx:1.25-alpine
+    container_name: nginx-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - frontend-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    labels:
+      - "role=web"
+      - "tier=frontend"
+
+  # ---------------------------------------------------------------------------
+  # 2. react-frontend  →  EXITED  (crashes immediately — missing backend URL)
+  # ---------------------------------------------------------------------------
+  react-frontend:
+    image: node:20-alpine
+    container_name: react-frontend
+    restart: "no"
+    networks:
+      - frontend-net
+    environment:
+      - REACT_APP_API_URL=http://fastapi-backend:8000
+      - NODE_ENV=production
+    command: >
+      sh -c "echo 'Starting React build...' &&
+             echo 'ERROR: Cannot connect to backend at http://fastapi-backend:8000' &&
+             echo 'Build failed with exit code 1' &&
+             exit 1"
+    labels:
+      - "role=frontend"
+      - "tier=frontend"
+
+  # ---------------------------------------------------------------------------
+  # 3. fastapi-backend  →  EXITED  (crashes — missing DB connection)
+  # ---------------------------------------------------------------------------
+  fastapi-backend:
+    image: python:3.11-alpine
+    container_name: fastapi-backend
+    restart: "no"
+    networks:
+      - backend-net
+    environment:
+      - DATABASE_URL=postgresql://appuser:wrongpassword@postgres-db:5432/appdb
+      - REDIS_URL=redis://redis-cache:6379/0
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - DEBUG=false
+    command: >
+      sh -c "echo 'FastAPI backend starting...' &&
+             echo 'Connecting to PostgreSQL at postgres-db:5432...' &&
+             echo 'FATAL: password authentication failed for user appuser' &&
+             echo 'Connection refused — check DATABASE_URL' &&
+             exit 1"
+    labels:
+      - "role=api"
+      - "tier=backend"
+
+  # ---------------------------------------------------------------------------
+  # 4. postgres-db  →  RUNNING  (primary database)
+  # ---------------------------------------------------------------------------
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    restart: unless-stopped
+    networks:
+      - backend-net
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=appdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d appdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    labels:
+      - "role=database"
+      - "tier=backend"
+
+  # ---------------------------------------------------------------------------
+  # 5. redis-cache  →  RUNNING  (in-memory cache)
+  # ---------------------------------------------------------------------------
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+    restart: unless-stopped
+    networks:
+      - backend-net
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    labels:
+      - "role=cache"
+      - "tier=backend"
+
+  # ---------------------------------------------------------------------------
+  # 6. rabbitmq-queue  →  RESTARTING  (crashes repeatedly — bad config)
+  # ---------------------------------------------------------------------------
+  rabbitmq-queue:
+    image: alpine:3.18
+    container_name: rabbitmq-queue
+    restart: always
+    networks:
+      - backend-net
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin123
+      - RABBITMQ_DEFAULT_VHOST=appvhost
+    command: >
+      sh -c "echo 'RabbitMQ starting on port 5672...' &&
+             sleep 3 &&
+             echo 'ERROR: AMQP port 5672 already in use' &&
+             echo 'CRASH: Cannot bind to address 0.0.0.0:5672' &&
+             echo 'Exiting with code 137 (OOM or port conflict)' &&
+             exit 1"
+    labels:
+      - "role=queue"
+      - "tier=backend"
+
+  # ---------------------------------------------------------------------------
+  # 7. elasticsearch  →  UNHEALTHY  (running but health check fails)
+  # ---------------------------------------------------------------------------
+  elasticsearch:
+    image: alpine:3.18
+    container_name: elasticsearch
+    restart: unless-stopped
+    networks:
+      - backend-net
+      - monitoring-net
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+      - cluster.name=docker-monitor-cluster
+    ports:
+      - "9200:9200"
+    healthcheck:
+      # This health check intentionally fails — simulates ES not fully started
+      test: ["CMD", "wget", "-qO-", "http://localhost:9200/_cluster/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    command: >
+      sh -c "echo 'Elasticsearch node starting...' &&
+             echo 'Cluster: docker-monitor-cluster' &&
+             echo 'WARN: JVM heap size 512MB may be insufficient' &&
+             echo 'INFO: Node is running but HTTP port 9200 not ready yet' &&
+             tail -f /dev/null"
+    labels:
+      - "role=search"
+      - "tier=backend"
+
+  # ---------------------------------------------------------------------------
+  # 8. kibana  →  RUNNING  (log visualization dashboard)
+  # ---------------------------------------------------------------------------
+  kibana:
+    image: alpine:3.18
+    container_name: kibana
+    restart: unless-stopped
+    networks:
+      - backend-net
+      - monitoring-net
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana
+      - SERVER_HOST=0.0.0.0
+    ports:
+      - "5601:5601"
+    healthcheck:
+      test: ["CMD", "echo", "healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    command: >
+      sh -c "echo 'Kibana starting on port 5601...' &&
+             echo 'Connecting to Elasticsearch at http://elasticsearch:9200' &&
+             echo 'Kibana is running' &&
+             tail -f /dev/null"
+    labels:
+      - "role=visualization"
+      - "tier=monitoring"
+
+  # ---------------------------------------------------------------------------
+  # 9. prometheus  →  RUNNING  (metrics collection)
+  # ---------------------------------------------------------------------------
+  prometheus:
+    image: alpine:3.18
+    container_name: prometheus
+    restart: unless-stopped
+    networks:
+      - monitoring-net
+    volumes:
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    environment:
+      - PROMETHEUS_RETENTION_TIME=15d
+      - PROMETHEUS_SCRAPE_INTERVAL=15s
+    healthcheck:
+      test: ["CMD", "echo", "healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    command: >
+      sh -c "echo 'Prometheus starting on port 9090...' &&
+             echo 'Loading configuration from /etc/prometheus/prometheus.yml' &&
+             echo 'Scraping targets: nginx-web, fastapi-backend, postgres-db' &&
+             echo 'Prometheus is ready' &&
+             tail -f /dev/null"
+    labels:
+      - "role=monitoring"
+      - "tier=monitoring"
+
+  # ---------------------------------------------------------------------------
+  # 10. grafana  →  RUNNING  (metrics dashboard)
+  # ---------------------------------------------------------------------------
+  grafana:
+    image: alpine:3.18
+    container_name: grafana
+    restart: unless-stopped
+    networks:
+      - monitoring-net
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_DOMAIN=localhost
+      - GF_DATABASE_TYPE=sqlite3
+    healthcheck:
+      test: ["CMD", "echo", "healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    command: >
+      sh -c "echo 'Grafana starting on port 3000...' &&
+             echo 'Admin user: admin / admin123' &&
+             echo 'Connecting to Prometheus datasource at http://prometheus:9090' &&
+             echo 'Grafana is ready' &&
+             tail -f /dev/null"
+    labels:
+      - "role=dashboard"
+      - "tier=monitoring"
