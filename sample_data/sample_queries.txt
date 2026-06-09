@@ -1,0 +1,29 @@
+Show all running containers
+
+Show all stopped containers
+
+List containers restarting in the last hour
+
+Show logs of nginx
+
+Show logs of container web-app
+
+Why is my container failing?
+
+Restart nginx container
+
+Stop container web-app
+
+Start container web-app
+
+Show CPU usage of all containers
+
+Show memory usage of all containers
+
+Which container is consuming the most resources?
+
+Show container statistics
+
+Analyze logs of web-app and identify issues
+
+Give root cause analysis for nginx container failure
