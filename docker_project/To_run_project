@@ -1,0 +1,4 @@
+install all the dependencies
+
+on terminal:
+  streamlit run app.py
