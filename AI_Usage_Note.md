@@ -2,83 +2,87 @@
 
 ## AI Tools Used
 
-The development of **InfraMind AI – Natural Language Docker Assistant** was supported using AI-assisted development tools such as ChatGPT, Claude, and GitHub Copilot. These tools were used to accelerate development, improve code quality, and assist with documentation.
+The development of **InfraMind AI – Natural Language Docker Assistant** was supported using **Claude AI** and **Kiro AI**. These AI-powered development assistants helped accelerate the project lifecycle from planning and architecture design to implementation and documentation.
 
 ### How AI Helped
 
-AI was utilized in the following areas:
+#### 1. Requirement Analysis and Planning
 
-#### 1. Requirement Analysis
+* Assisted in understanding the problem statement and evaluation criteria.
+* Helped define project scope suitable for the given timeline.
+* Suggested the Natural Language to Docker management approach.
 
-* Understanding the project requirements and evaluation criteria.
-* Identifying suitable technologies and architecture.
-* Refining the project scope to fit the development timeline.
+#### 2. System Design and Architecture
 
-#### 2. Code Suggestions
+* Recommended the overall architecture using React, FastAPI, Docker SDK, and AI Agent workflows.
+* Assisted in designing the interaction flow between the user, AI agent, and Docker services.
+* Provided guidance on backend and frontend folder structures.
 
-* Generating FastAPI backend boilerplate code.
-* Creating Docker SDK integration functions.
-* Assisting with React component development.
-* Providing LangChain agent implementation examples.
+#### 3. Code Generation and Development
 
-#### 3. UI/UX Design
+* Generated boilerplate code for FastAPI APIs.
+* Assisted in Docker SDK integration for container management operations.
+* Helped create React components and dashboard layouts.
+* Suggested implementation strategies for natural language processing and intent handling.
 
-* Suggesting dashboard layouts and user interface components.
-* Improving chat interface design.
-* Recommending responsive design practices.
+#### 4. UI/UX Improvements
 
-#### 4. Debugging and Issue Resolution
+* Provided recommendations for dashboard design and user experience.
+* Suggested responsive layouts and modern interface components.
+* Helped improve chatbot interaction design.
 
-* Identifying Python syntax and dependency issues.
-* Troubleshooting Docker SDK integration errors.
-* Resolving API communication problems between frontend and backend.
+#### 5. Debugging and Troubleshooting
 
-#### 5. Documentation Support
+* Assisted in identifying coding errors and dependency issues.
+* Suggested fixes for API integration problems.
+* Helped resolve frontend-backend communication issues.
 
-* Generating README content.
-* Assisting with project architecture documentation.
-* Creating setup instructions and project descriptions.
+#### 6. Documentation Support
+
+* Assisted in creating README files.
+* Generated project descriptions and feature explanations.
+* Helped prepare technical documentation and presentation content.
 
 ---
 
 ## What AI Got Wrong
 
-Although AI significantly accelerated development, several outputs required manual verification and correction.
+While AI significantly improved productivity, several outputs required manual review and correction.
 
-### Incorrect Docker Commands
+### Incorrect Implementation Suggestions
 
-Some generated Docker commands were outdated or incompatible with the local Docker environment and required modification before execution.
+Some generated code snippets required modifications to align with the project's architecture and coding standards.
 
-### Hallucinated APIs
+### Non-Existent or Inaccurate APIs
 
-In certain cases, AI suggested functions or libraries that did not exist in the Docker SDK or LangChain framework. These recommendations were verified against official documentation and corrected manually.
+In certain instances, AI suggested methods or APIs that were unavailable or incompatible with the selected technology stack. These were verified and corrected using official documentation.
 
-### Architecture Assumptions
+### Over-Engineered Solutions
 
-AI occasionally proposed overly complex architectures that exceeded the project timeline. The implementation was simplified to focus on core functionality and demonstration readiness.
+Some recommendations introduced unnecessary complexity for a one-day implementation timeline. The team simplified these suggestions to maintain project feasibility.
 
 ### Incomplete Error Handling
 
-Generated code sometimes lacked proper exception handling, validation, or edge-case management. Additional checks were added manually during development.
+Certain generated code lacked proper validation and exception handling, which were manually improved during development and testing.
 
 ---
 
 ## Most Useful Prompts
 
-### Prompt 1: Docker SDK Integration
+### Prompt 1 – Docker SDK Integration
 
-"Act as a senior Python developer. Create Docker SDK functions for listing containers, retrieving logs, restarting containers, and collecting container statistics using clean, production-ready code."
+"Act as a senior Python developer. Create Docker SDK functions for listing containers, retrieving container logs, restarting containers, and monitoring container resource usage."
 
-### Prompt 2: AI Agent Design
+### Prompt 2 – AI Agent Workflow Design
 
-"Design a LangChain-based AI agent that converts natural language requests into Docker operations. The agent should choose appropriate tools, execute Docker actions, and explain results in human-readable language."
+"Design an AI agent that converts natural language user requests into Docker operations. The agent should select the correct tool, execute the operation, and explain the result in human-readable language."
 
-### Prompt 3: Root Cause Analysis
+### Prompt 3 – Dashboard and UI Development
 
-"Analyze Docker container logs and generate a structured response containing root cause, confidence score, and recommended fix in simple language suitable for developers."
+"Generate a modern React dashboard for monitoring Docker containers, including container status, resource usage, recent events, and an AI-powered chat interface."
 
 ---
 
 ## Conclusion
 
-AI tools significantly improved development speed, assisted in code generation, debugging, design decisions, and documentation preparation. However, all AI-generated outputs were carefully reviewed, tested, and validated before inclusion in the final project to ensure correctness, reliability, and project quality.
+Claude AI and Kiro AI played a significant role in accelerating development by assisting with requirement analysis, architecture design, code generation, debugging, UI design, and documentation. All AI-generated outputs were reviewed, tested, and refined by the development team before being incorporated into the final project to ensure accuracy, reliability, and project quality.
