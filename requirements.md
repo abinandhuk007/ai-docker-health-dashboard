@@ -6,10 +6,18 @@ streamlit-autorefresh==1.0.1
 docker==7.1.0
 
 # LLM Providers (install the one(s) you use)
-anthropic>=0.40.0               # Claude — recommended
-google-generativeai==0.7.2      # Gemini — optional fallback
-groq==0.9.0                     # Groq   — optional fallback
-# ollama                        # Uncomment for local Ollama
+
+# Claude — recommended
+anthropic>=0.40.0              
+
+# Gemini — optional fallback
+google-generativeai==0.7.2 
+
+# Groq   — optional fallback
+groq==0.9.0      
+
+# Uncomment for local Ollama
+ollama                        
 
 # Data & visualization
 pandas==2.2.2
