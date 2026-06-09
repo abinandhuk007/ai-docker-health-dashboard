@@ -1,13 +1,23 @@
 streamlit==1.35.0
 
 docker==7.1.0
+
 google-generativeai==0.7.2
+
 groq==0.9.0
+
 ollama>=0.2.0
+
 pandas==2.2.2
+
 python-dotenv==1.0.1
+
 psycopg2-binary==2.9.9
+
 sqlalchemy==2.0.30
+
 pydantic==2.7.4
+
 loguru==0.7.2
+
 plotly==5.22.0
