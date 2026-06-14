@@ -31,7 +31,7 @@ User Query → Intent Detection → Docker SDK → Data Processing → AI Analys
 
 * Python 3.10+
 * Docker Desktop
-* Ollama or Groq API Key
+* Groq API Key
 
 ### Clone Repository
 
