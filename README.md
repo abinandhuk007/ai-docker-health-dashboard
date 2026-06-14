@@ -18,7 +18,7 @@ An AI-powered Docker monitoring dashboard that enables users to interact with Do
 * Python
 * Streamlit
 * Docker SDK for Python
-* Ollama / Groq
+* Groq
 * Docker Engine
 
 ## Architecture
