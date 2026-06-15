@@ -1,14 +1,5 @@
 # Test Cases
 
-## Testing Framework
-
-* Backend Testing: Pytest
-* API Testing: FastAPI TestClient
-* Frontend Validation: Streamlit UI Verification
-* Docker Operations: Mocked Docker SDK Responses
-
----
-
 # Test Case 1: List Running Containers
 
 ### Objective
@@ -196,61 +187,7 @@ PASS
 
 ---
 
-# Pytest Automated Test Cases
 
-## Test: Intent Detection
-
-```python
-def test_detect_list_containers_intent():
-    query = "Show all running containers"
-    intent = detect_intent(query)
-    assert intent == "list_running_containers"
-```
-
-Expected Result:
-PASS
-
----
-
-## Test: Container Listing
-
-```python
-def test_list_containers():
-    containers = docker_service.list_containers()
-    assert isinstance(containers, list)
-```
-
-Expected Result:
-PASS
-
----
-
-## Test: Container Logs
-
-```python
-def test_get_logs():
-    logs = docker_service.get_logs("nginx")
-    assert logs is not None
-```
-
-Expected Result:
-PASS
-
----
-
-## Test: Container Statistics
-
-```python
-def test_container_stats():
-    stats = docker_service.get_stats("nginx")
-    assert "cpu" in stats
-    assert "memory" in stats
-```
-
-Expected Result:
-PASS
-
----
 
 ## Test: Restart Container
 
