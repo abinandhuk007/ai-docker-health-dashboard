@@ -14,22 +14,19 @@ The development of **InfraMind AI – Natural Language Docker Assistant** was su
 
 #### 2. System Design and Architecture
 
-* Recommended the overall architecture using React, FastAPI, Docker SDK, and AI Agent workflows.
+* Recommended the overall architecture using Docker SDK, and AI Agent workflows.
 * Assisted in designing the interaction flow between the user, AI agent, and Docker services.
 * Provided guidance on backend and frontend folder structures.
 
 #### 3. Code Generation and Development
 
-* Generated boilerplate code for FastAPI APIs.
 * Assisted in Docker SDK integration for container management operations.
-* Helped create React components and dashboard layouts.
 * Suggested implementation strategies for natural language processing and intent handling.
 
 #### 4. UI/UX Improvements
 
 * Provided recommendations for dashboard design and user experience.
 * Suggested responsive layouts and modern interface components.
-* Helped improve chatbot interaction design.
 
 #### 5. Debugging and Troubleshooting
 
