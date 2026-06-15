@@ -120,8 +120,8 @@ cp .env.example .env     # Mac/Linux
 Edit `.env` and add your API key:
 
 ```dotenv
-LLM_PROVIDER=gemini
-GEMINI_API_KEY=your_key_here
+LLM_PROVIDER=groq
+GROQ_API_KEY=your_key_here
 ```
 
 > **No API key?** The app still works using keyword-based fallback and demo Docker data.
@@ -137,16 +137,9 @@ Open [http://localhost:8501](http://localhost:8501) in your browser.
 
 ## 🔑 LLM Provider Options
 
-### Option A: Google Gemini (Recommended — free tier)
-1. Go to [https://aistudio.google.com](https://aistudio.google.com)
-2. Create an API key (free, no credit card)
-3. Set in `.env`:
-   ```
-   LLM_PROVIDER=gemini
-   GEMINI_API_KEY=your_key
-   ```
 
-### Option B: Groq (Extremely fast, free tier)
+
+### Groq (Extremely fast, free tier)
 1. Sign up at [https://console.groq.com](https://console.groq.com)
 2. Create an API key
 3. Set in `.env`:
@@ -154,31 +147,6 @@ Open [http://localhost:8501](http://localhost:8501) in your browser.
    LLM_PROVIDER=groq
    GROQ_API_KEY=your_key
    ```
-
-### Option C: Ollama (Fully offline, no API key)
-1. Install Ollama: [https://ollama.ai](https://ollama.ai)
-2. Pull a model: `ollama pull llama3`
-3. Set in `.env`:
-   ```
-   LLM_PROVIDER=ollama
-   OLLAMA_MODEL=llama3
-   ```
-
----
-
-## 🐘 PostgreSQL Setup (Optional)
-
-```bash
-# Create database
-createdb docker_monitor
-
-# Set connection string in .env
-DATABASE_URL=postgresql://postgres:password@localhost:5432/docker_monitor
-```
-
-The schema is auto-created on first run.
-
----
 
 ## 💬 Sample Queries
 
